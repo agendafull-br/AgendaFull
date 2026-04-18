@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AgendaFull • Sistemas de Agendamento Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b081a;
+            color: #fff;
+            line-height: 1.5;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 🌌 NOVA IMAGEM DE FUNDO PROMOCIONAL + OVERLAY ROXO */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(74, 20, 140, 0.85) 0%, rgba(26, 15, 50, 0.9) 100%),
+                url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop') center center / cover no-repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Efeito de partículas/gradiente animado sobre a imagem */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(168, 85, 247, 0.25) 0%, transparent 60%),
+                        radial-gradient(circle at 80% 70%, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulseGlow 12s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            background: rgba(10, 5, 20, 0.3);
+            border-radius: 0 0 20px 20px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #c084fc;
+        }
+
+        .btn-whatsapp-nav {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            box-shadow: 0 8px 20px -6px rgba(124, 58, 237, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px -10px rgba(168,85,247,0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(20, 10, 40, 0.5);
+            backdrop-filter: blur(12px);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+        }
+
+        /* Hero */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 60px 0 80px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #fbbf24, #f97316, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat h3 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #c084fc;
+        }
+
+        .hero-image {
+            background: rgba(20, 10, 40, 0.3);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            display: block;
+            border: 2px solid rgba(168,85,247,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.02);
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 56px;
+            font-size: 18px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+        }
+
+        /* CARD EXPANSÍVEL */
+        .product-card {
+            background: rgba(20, 15, 40, 0.5);
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(168,85,247,0.6);
+            box-shadow: 0 30px 50px -20px rgba(168,85,247,0.4);
+        }
+
+        .card-header {
+            padding: 32px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(168,85,247,0.4);
+            background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(124,58,237,0.1));
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .product-card h3 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .product-card .desc {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .btn-buy-header {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-buy-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        .btn-view-plans {
+            width: 100%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-view-plans:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(168, 85, 247, 0.7);
+            background: linear-gradient(135deg, #9333ea, #6d28d9);
+        }
+
+        .plan-options {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.3s;
+            background: rgba(0,0,0,0.2);
+            padding: 0 28px;
+        }
+
+        .product-card.active .plan-options {
+            max-height: 1400px;
+            opacity: 1;
+            padding: 24px 28px 28px;
+            overflow-y: auto;
+        }
+
+        .plan-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+
+        .plan-item:hover {
+            background: rgba(168,85,247,0.15);
+            border-color: rgba(168,85,247,0.4);
+        }
+
+        .plan-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .plan-name {
+            font-weight: 700;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .plan-price {
+            text-align: right;
+        }
+
+        .price-vista {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fbbf24;
+            line-height: 1.2;
+        }
+
+        .price-mensal {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .price-mensal strong {
+            color: #c084fc;
+            font-weight: 700;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .plan-features li {
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .plan-features li i {
+            color: #c084fc;
+            width: 16px;
+            font-size: 14px;
+        }
+
+        .btn-plan {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        .btn-plan:hover {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            border-color: transparent;
+            transform: scale(1.02);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .feature-item {
+            padding: 24px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .feature-item h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .testimonial-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+        }
+
+        .testimonial-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .cta-section {
+            background: rgba(30, 15, 60, 0.5);
+            backdrop-filter: blur(16px);
+            border-radius: 48px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            margin-bottom: 32px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .price-badge {
+            background: rgba(251, 191, 36, 0.2);
+            border-radius: 50px;
+            padding: 8px 20px;
+            display: inline-block;
+            margin-bottom: 24px;
+            font-weight: 600;
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25D366;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 25px rgba(37, 211, 102, 0.6);
+            transition: all 0.3s;
+            z-index: 999;
+            text-decoration: none;
+            color: white;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+
+        /* Footer e Contato/SAC */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-col ul li a:hover {
+            color: #c084fc;
+        }
+
+        .sac-badge {
+            background: rgba(168,85,247,0.2);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid rgba(168,85,247,0.4);
+            text-align: center;
+        }
+
+        .sac-badge i {
+            font-size: 24px;
+            color: #c084fc;
+            margin-bottom: 8px;
+        }
+
+        .sac-badge h5 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .sac-badge p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 12px;
+        }
+
+        .btn-sac {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-sac:hover {
+            background: #7c3aed;
+            border-color: #7c3aed;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-img {
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/agendafull-br/Agendalogo/refs/heads/main/logo.png" alt="AgendaFull Logo" class="logo-img">
+                Agenda<span>Full</span>
+            </div>
+            <div class="nav-links">
+                <a href="#produtos">Sistemas</a>
+                <a href="#diferenciais">Diferenciais</a>
+                <a href="#depoimentos">Clientes</a>
+                <a href="#" class="btn-whatsapp-nav" onclick="contatoGeral(); return false;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div>
+                <h1>Sistema de Agendamento<br>para <span>seu negócio</span> decolar</h1>
+                <p>Tenha um site profissional com agendamento online em 24h. Cliente marca sozinho, você só trabalha. Escolha o plano ideal para o seu momento.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="scrollToProducts()"><i class="fas fa-gem"></i> Ver sistemas</button>
+                    <button class="btn-secondary" onclick="contatoGeral()"><i class="fas fa-handshake"></i> Quero ser revendedor</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><h3>50+</h3><p>Negócios atendidos</p></div>
+                    <div class="stat"><h3>24h</h3><p>Suporte online</p></div>
+                    <div class="stat"><h3>100%</h3><p>Clientes satisfeitos</p></div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://raw.githubusercontent.com/agendafull-br/Amostra/refs/heads/main/amostra.png" alt="Dashboard de agendamento profissional">
+            </div>
+        </section>
+
+        <!-- Produtos com planos atualizados -->
+        <section id="produtos" class="section">
+            <h2 class="section-title"><i class="fas fa-box-open"></i> Sistemas disponíveis</h2>
+            <p class="section-subtitle">Escolha o sistema ideal para seu negócio e veja os planos disponíveis</p>
+            
+            <div class="products-grid" id="products-container"></div>
+        </section>
+
+        <!-- Diferenciais -->
+        <section id="diferenciais" class="section">
+            <h2 class="section-title"><i class="fas fa-star"></i> Por que escolher a AgendaFull?</h2>
+            <p class="section-subtitle">Tecnologia que transforma seu negócio</p>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>Rápido e prático</h4>
+                    <p>Site instalado em 24h, seu cliente já pode agendar amanhã</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h4>100% Mobile</h4>
+                    <p>Funciona perfeitamente no celular do cliente e no seu</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>Seguro e confiável</h4>
+                    <p>Dados protegidos, sistema testado e aprovado</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+                    <h4>Firebase incluso</h4>
+                    <p>Banco de dados na nuvem, sem custo extra para você</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Depoimentos -->
+        <section id="depoimentos" class="section">
+            <h2 class="section-title"><i class="fas fa-comment-dots"></i> Quem já comprou</h2>
+            <p class="section-subtitle">Clientes que estão faturando mais com nosso sistema</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">"Comprei o plano melhorado para barbearia e em uma semana já recuperei o investimento. Clientes adoram marcar online!"</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar"><i class="fas fa-user"></i></div>
+                        <div><strong>Carlos Silva</strong><br>Barbearia do Carlos</div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">"Site lindo, fácil de usar e o suporte é excelente. Comecei com o básico e migrei pro personalizado em 1 mês."</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar"><i class="fas fa-user"></i></div>
+                        <div><strong>Fernanda Lima</strong><br>Bellezza Studio</div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">"Revendo os sistemas para meus clientes e já lucrei mais de R$ 3.000 em dois meses. Melhor decisão!"</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar"><i class="fas fa-briefcase"></i></div>
+                        <div><strong>Rafael Mendes</strong><br>Revendedor</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <div class="price-badge"><i class="fas fa-tags"></i> OFERTA ESPECIAL LANÇAMENTO</div>
+            <h2>Comece a vender agora mesmo</h2>
+            <p>Adquira seu sistema a partir de <strong style="font-size: 32px; color: #fbbf24;">R$ 197</strong> à vista + mensalidade de R$ 29,90</p>
+            <button class="btn-primary" style="padding: 16px 48px; font-size: 18px;" onclick="contatoGeral()"><i class="fas fa-rocket"></i> Quero meu sistema agora</button>
+            <p style="margin-top: 24px; font-size: 14px;"><i class="fas fa-tools"></i> Revendedores: ganhe 30% de comissão em cada venda</p>
+        </div>
+
+        <!-- Footer com Contato e SAC -->
+        <footer>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4><i class="fas fa-globe"></i> AgendaFull</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Sobre nós</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Blog</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Carreiras</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Termos de uso</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="fas fa-cubes"></i> Sistemas</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Barbearia</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Salão de beleza</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Clínica</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Restaurante</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="fas fa-headset"></i> Contato & SAC</h4>
+                    <div class="sac-badge">
+                        <i class="fas fa-headphones"></i>
+                        <h5>Atendimento 24h no PV</h5>
+                        <p>Para clientes dos planos Melhorado e Personalizado</p>
+                        <a href="#" class="btn-sac" onclick="abrirSAC(); return false;"><i class="fab fa-whatsapp"></i> Falar com Suporte</a>
+                    </div>
+                    <ul style="margin-top: 20px;">
+                        <li><a href="#" onclick="contatoGeral(); return false;"><i class="fab fa-whatsapp"></i> WhatsApp Comercial</a></li>
+                        <li><a href="mailto:contato@agendafull.com"><i class="far fa-envelope"></i> agendafull.br@gmail.com</a></li>
+                        <li><a href="#"><i class="fab fa-instagram"></i> @agendafull10</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="fas fa-clock"></i> Horário SAC</h4>
+                    <ul>
+                        <li><i class="far fa-calendar-check"></i> Segunda a Sexta: 8h às 20h</li>
+                        <li><i class="far fa-calendar-check"></i> Sábado: 9h às 14h</li>
+                        <li><i class="fas fa-phone-alt"></i> (11) 919698999</li>
+                        <li><i class="fas fa-map-marker-alt"></i> São Paulo, SP</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2026 AgendaFull - Sistemas de Agendamento Profissional</p>
+                <p style="margin-top: 8px;"><i class="fas fa-code"></i> Desenvolvido para empreendedores que querem vender mais</p>
+                <p style="margin-top: 12px;"><a href="#" style="color: #a855f7; text-decoration: none;" onclick="contatoGeral(); return false;"><i class="fas fa-life-ring"></i> Central de Ajuda / SAC</a> | <a href="#" style="color: #a855f7; text-decoration: none;" onclick="contatoGeral(); return false;">Política de Privacidade</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- WhatsApp flutuante -->
+    <a href="#" class="whatsapp-float" onclick="contatoGeral(); return false;"><i class="fab fa-whatsapp"></i></a>
+
+    <script>
+        const SEU_WHATSAPP = "5511919698999"; 
+        
+        // Planos atualizados conforme solicitado:
+        // 1. Plano básico: 197 à vista + 29,90 mês (Site básico com agendamento comum e bonito)
+        // 2. Plano melhorado: 227 à vista + 39,90 mês (Site melhorado, agendamento, notificação, assistência 24h PV)
+        // 3. Plano personalizado: 397 à vista + 59,90 mês (Tudo anterior + imagens personalizadas, app incluso, assistência técnica personalizada)
+        const produtosData = [
+            {
+                nome: "Barbearia Style",
+                icone: "✂️",
+                imagem: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema completo para barbearias com agendamento de cortes, barba e combo.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Agendamento comum 24h", "Painel admin simples", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Site mais poderoso", "Notificação de novo agendamento", "Assistência 24h no PV", "Controle de comissões"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Assistência técnica personalizada", "App white-label"] }
+                ]
+            },
+            {
+                nome: "Salão de Beleza",
+                icone: "💅",
+                imagem: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema elegante para salões, com serviços de cabelo, manicure, maquiagem.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Agendamento comum", "Catálogo de serviços", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Notificação de agendamento", "Assistência 24h no PV", "Relatórios semanais", "Fidelidade de clientes"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Consultoria de marketing", "Multi-unidades"] }
+                ]
+            },
+            {
+                nome: "Clínica Médica",
+                icone: "🏥",
+                imagem: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema para clínicas, consultórios e profissionais da saúde.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Agendamento 24h", "Prontuário básico", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Notificação de agendamento", "Assistência 24h no PV", "Receita digital", "Telemedicina (link)"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Assistência técnica personalizada", "Integração com convênios"] }
+                ]
+            },
+            {
+                nome: "Restaurante",
+                icone: "🍽️",
+                imagem: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema de reservas para restaurantes, bares e eventos.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Reserva de mesas", "Cardápio digital", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Notificação de reserva", "Assistência 24h no PV", "Gestão de fila de espera", "Pedidos antecipados"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Integração iFood/rappid", "PDV simplificado"] }
+                ]
+            },
+            {
+                nome: "Academia",
+                icone: "🏋️",
+                imagem: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema para academias, estúdios e personal trainers.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Agendamento de aulas", "Controle de alunos", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Notificação de aula", "Assistência 24h no PV", "Check-in por QR Code", "Evolução de treino"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Assistência técnica personalizada", "App do aluno"] }
+                ]
+            },
+            {
+                nome: "Lojas e Comércio",
+                icone: "🛍️",
+                imagem: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=250&fit=crop&auto=format&q=80",
+                desc: "Sistema para lojas, consultorias e atendimento agendado.",
+                opcoes: [
+                    { nome: "Básico", precoVista: 197, precoMensal: 29.90, features: ["Site básico bonito", "Agendamento de clientes", "Catálogo de produtos", "Firebase incluso"] },
+                    { nome: "Melhorado", precoVista: 227, precoMensal: 39.90, features: ["Tudo do Básico", "Notificação de agendamento", "Assistência 24h no PV", "Link de pagamento", "Estoque integrado"] },
+                    { nome: "Personalizado", precoVista: 397, precoMensal: 59.90, features: ["Tudo do Melhorado", "Imagens personalizadas", "Aplicativo incluso", "Integração Shopify", "Automação de marketing"] }
+                ]
+            }
+        ];
+
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = produtosData.map((produto) => {
+                const opcoesHtml = produto.opcoes.map(opcao => `
+                    <div class="plan-item">
+                        <div class="plan-header">
+                            <span class="plan-name">${opcao.nome}</span>
+                            <div class="plan-price">
+                                <div class="price-vista">R$ ${opcao.precoVista} <small style="font-size: 12px; font-weight: 400;">à vista</small></div>
+                                <div class="price-mensal">+ <strong>R$ ${opcao.precoMensal.toFixed(2).replace('.', ',')}/mês</strong></div>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            ${opcao.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')}
+                        </ul>
+                        <button class="btn-plan" onclick="event.stopPropagation(); comprarPlano('${produto.nome}', '${opcao.nome}', ${opcao.precoVista}, ${opcao.precoMensal})">
+                            <i class="fab fa-whatsapp"></i> Comprar ${opcao.nome}
+                        </button>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="product-card">
+                        <div class="card-header">
+                            <img src="${produto.imagem}" alt="${produto.nome}" class="product-image" onerror="this.src='https://via.placeholder.com/500x250/1a153a/a855f7?text=${encodeURIComponent(produto.nome)}'">
+                            <h3>
+                                ${produto.nome}
+                                <button class="btn-buy-header" onclick="event.stopPropagation(); comprarPlano('${produto.nome}', 'Consultar', 0, 0)">
+                                    <i class="fab fa-whatsapp"></i> Comprar
+                                </button>
+                            </h3>
+                            <p class="desc">${produto.desc}</p>
+                            <button class="btn-view-plans" onclick="event.stopPropagation(); toggleCard(this.closest('.product-card'))">
+                                <span><i class="fas fa-list-ul"></i> VER 3 PLANOS DISPONÍVEIS</span>
+                                <span style="font-size: 18px;"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                        </div>
+                        <div class="plan-options">
+                            ${opcoesHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleCard(card) {
+            const allCards = document.querySelectorAll('.product-card');
+            allCards.forEach(c => {
+                if (c !== card) c.classList.remove('active');
+            });
+            card.classList.toggle('active');
+            const btn = card.querySelector('.btn-view-plans');
+            btn.innerHTML = card.classList.contains('active') ? 
+                '<span><i class="fas fa-times-circle"></i> FECHAR PLANOS</span><span style="font-size: 18px;"><i class="fas fa-chevron-up"></i></span>' : 
+                '<span><i class="fas fa-list-ul"></i> VER 3 PLANOS DISPONÍVEIS</span><span style="font-size: 18px;"><i class="fas fa-chevron-down"></i></span>';
+        }
+
+        function comprarPlano(produtoNome, planoNome, precoVista, precoMensal) {
+            let mensagem = precoVista === 0 ?
+                `Olá! Tenho interesse no sistema *${produtoNome}*.\n\nGostaria de saber mais sobre os planos disponíveis e valores! 🚀` :
+                `Olá! Tenho interesse no sistema *${produtoNome}* - Plano *${planoNome}*.\n\n💵 À vista: R$ ${precoVista}\n📅 Mensalidade: R$ ${precoMensal.toFixed(2).replace('.', ',')}/mês\n\nGostaria de mais informações para fechar negócio! 🚀`;
+            window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`, '_blank');
+        }
+
+        function scrollToProducts() {
+            document.getElementById('produtos').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function contatoGeral() {
+            window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent("Olá! Vi o site AgendaFull e quero saber mais sobre os sistemas de agendamento e revenda.")}`, '_blank');
+        }
+
+        function abrirSAC() {
+            window.open(`https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent("Olá, gostaria de falar com o SAC / Suporte 24h. Sou cliente do plano Melhorado ou Personalizado.")}`, '_blank');
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
