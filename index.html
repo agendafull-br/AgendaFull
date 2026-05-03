@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#06090E">
+  <meta name="description" content="AgendaFull - Sistemas de agendamento que transformam barbearias e salões em máquinas de vendas. Tecnologia, elegância e resultados.">
+  <title>AgendaFull • O futuro dos agendamentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #F6E27A;
+      --gold-dark: #9A7B1C;
+      --gold-glow: rgba(212, 175, 55, 0.5);
+      --bg-deep: #06090E;
+      --bg-card: #0C1017;
+      --bg-elevated: #131A22;
+      --text-primary: #ECEEF0;
+      --text-secondary: #9EA7B3;
+      --border-subtle: #1E2630;
+      --border-gold: rgba(212, 175, 55, 0.35);
+      --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.6);
+      --shadow-gold: 0 0 60px rgba(212, 175, 55, 0.2);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 30% 0%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 100%, rgba(212, 175, 55, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+    .mega-logo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0 10px;
+      position: relative;
+    }
+    .logo-pulse-ring {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 2px solid rgba(212, 175, 55, 0.2);
+      animation: pulseRing 3s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      50% { transform: scale(1.25); opacity: 0.15; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .logo-gif-wrapper {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-card);
+      border-radius: 50%;
+      padding: 10px;
+      border: 3px solid var(--border-gold);
+      box-shadow: 0 0 50px var(--gold-glow), 0 10px 40px rgba(0,0,0,0.7);
+      transition: var(--transition);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-gif-wrapper:hover {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 75px rgba(212, 175, 55, 0.55);
+      transform: scale(1.04);
+    }
+    .logo-gif-large {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: #fff;
+    }
+    .brand-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: -1.2px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F6E27A 30%, #D4AF37 60%, #9A7B1C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 6px;
+      text-align: center;
+    }
+    .tagline { font-size: 1.1rem; color: var(--text-secondary); margin-top: 6px; text-align: center; }
+
+    .hero { text-align: center; padding: 30px 0 40px; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5.5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #D4AF37 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 1.15rem; color: var(--text-secondary); max-width: 620px; margin: 0 auto 30px; }
+    .cta-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #121820;
+      padding: 16px 36px;
+      border-radius: 60px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border: 1px solid var(--border-gold);
+      transition: var(--transition);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    }
+    .cta-whatsapp i { color: #25D366; font-size: 1.5rem; }
+    .cta-whatsapp:hover {
+      background: #1A2430;
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+    }
+
+    .trust-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 36px;
+      margin: 24px 0 50px;
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .trust-item { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); font-weight: 500; }
+    .trust-item i { color: var(--gold); }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 30px 0 60px;
+    }
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px 26px 30px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .product-card.featured {
+      border-color: var(--border-gold);
+      box-shadow: var(--shadow-gold);
+      background: linear-gradient(160deg, #101820 0%, #0C1017 100%);
+    }
+    .product-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-10px);
+      box-shadow: 0 30px 55px rgba(0,0,0,0.8);
+    }
+    .badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #D4AF37, #F6E27A);
+      color: #000;
+      font-weight: 800;
+      font-size: 0.68rem;
+      padding: 7px 16px;
+      border-radius: 30px;
+    }
+    .product-icon { font-size: 2.6rem; color: var(--gold-light); margin-bottom: 20px; }
+    .product-name { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+    .product-type { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 28px; }
+    .price-block {
+      background: var(--bg-deep);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      margin: 16px 0 24px;
+      border: 1px solid var(--border-subtle);
+    }
+    .installment { display: flex; justify-content: space-between; margin-bottom: 14px; }
+    .installment span:last-child { font-weight: 700; color: var(--gold-light); }
+    .monthly { display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--text-secondary); }
+    .monthly span:last-child { font-weight: 600; color: #fff; }
+    .features-list { list-style: none; margin: 22px 0 30px; flex: 1; }
+    .features-list li { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; margin-bottom: 13px; color: #C9D0D8; }
+    .features-list i { color: var(--gold); width: 18px; }
+    .buy-button {
+      background: linear-gradient(135deg, #D4AF37 0%, #F6E27A 100%);
+      color: #06090E;
+      border: none;
+      padding: 17px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      box-shadow: 0 10px 24px rgba(212,175,55,0.35);
+    }
+    .buy-button:hover {
+      box-shadow: 0 16px 36px rgba(212,175,55,0.55);
+      transform: scale(1.04);
+    }
+
+    .section-title { text-align: center; font-size: 2.2rem; font-weight: 800; margin: 60px 0 30px; }
+    .advantages {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .adv-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px 24px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .adv-card:hover { border-color: var(--border-gold); }
+    .adv-card i { font-size: 2.4rem; color: var(--gold); margin-bottom: 18px; }
+    .adv-card h4 { font-weight: 700; margin-bottom: 8px; }
+    .adv-card p { font-size: 0.85rem; color: var(--text-secondary); }
+
+    footer { text-align: center; padding: 40px 0; color: #5A636E; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.04); }
+    footer a { color: var(--gold); text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .logo-gif-large { width: 110px; height: 110px; }
+      .brand-title { font-size: 2.4rem; }
+      .hero h1 { font-size: 1.9rem; }
+      .container { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="mega-logo-section">
+      <div class="logo-pulse-ring"></div>
+      <div class="logo-gif-wrapper">
+        <img src="https://raw.githubusercontent.com/agendafull-br/gif1/refs/heads/main/ea8472a6034246738f94890a2f5060dc_watermark-156426215690969%20(1).gif" 
+             alt="AgendaFull Logo Animada" 
+             class="logo-gif-large"
+             loading="eager">
+      </div>
+      <h2 class="brand-title">AgendaFull</h2>
+      <p class="tagline">Tecnologia que impulsiona seu negócio</p>
+    </div>
+
+    <div class="hero">
+      <h1>Seu sistema de agendamentos<br>no próximo nível</h1>
+      <p>Barbearias e salões de beleza que usam AgendaFull faturam mais, organizam melhor e encantam clientes.</p>
+      <a class="cta-whatsapp" id="whatsappButton" href="https://wa.me/5511919698999?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20os%20sistemas%20AgendaFull" target="_blank">
+        <i class="fab fa-whatsapp"></i> Garantir meu sistema agora • 11 91969-8999
+      </a>
+    </div>
+
+    <div class="trust-strip">
+      <div class="trust-item"><i class="fas fa-rocket"></i> Entrega em até 24h</div>
+      <div class="trust-item"><i class="fas fa-headset"></i> Suporte dedicado</div>
+      <div class="trust-item"><i class="fas fa-shield-haltered"></i> Dados seguros</div>
+      <div class="trust-item"><i class="fas fa-mobile-screen"></i> 100% responsivo</div>
+    </div>
+
+    <div class="products-grid" id="productsContainer"></div>
+
+    <div class="section-title">✨ O que torna a AgendaFull imbatível</div>
+    <div class="advantages">
+      <div class="adv-card"><i class="fas fa-gem"></i><h4>Visual de alto padrão</h4><p>Design premium que transmite credibilidade.</p></div>
+      <div class="adv-card"><i class="fas fa-cloud-arrow-up"></i><h4>Hospedagem gratuita</h4><p>Publicamos no GitHub Pages sem custo extra.</p></div>
+      <div class="adv-card"><i class="fas fa-bell"></i><h4>Alertas inteligentes</h4><p>Notificações a cada novo agendamento.</p></div>
+      <div class="adv-card"><i class="fas fa-wallet"></i><h4>Investimento inteligente</h4><p>Taxa única + mensalidade acessível.</p></div>
+    </div>
+  </div>
+
+  <footer>© 2026 <a href="https://wa.me/5511919698999">AgendaFull</a> • Todos os direitos reservados</footer>
+
+  <script>
+    // ==================== FIREBASE CONFIG ====================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZvfBg_FNdmifOPJH1ZY6ZWyXvaXIbJkY",
+      authDomain: "banco-de88a.firebaseapp.com",
+      projectId: "banco-de88a",
+      storageBucket: "banco-de88a.firebasestorage.app",
+      messagingSenderId: "742161187025",
+      appId: "1:742161187025:web:8803bccbafe96e7422c5f0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ==================== CONTAGEM DE VISITAS (INVISÍVEL) ====================
+    async function registrarVisita() {
+      const contadorRef = db.collection('estatisticas').doc('visitas_loja');
+      try {
+        const doc = await contadorRef.get();
+        if (doc.exists) {
+          await contadorRef.update({
+            total: (doc.data().total || 0) + 1,
+            ultimaVisita: firebase.firestore.FieldValue.serverTimestamp(),
+            ultimoIP: localStorage.getItem('visitante_id') || 'anonimo'
+          });
+        } else {
+          await contadorRef.set({
+            total: 1,
+            criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+            ultimaVisita: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao registrar visita:', error);
+      }
+    }
+
+    // ==================== CONTAGEM DE CLIQUE NO WHATSAPP ====================
+    async function registrarCliqueWhatsApp() {
+      const cliqueRef = db.collection('estatisticas').doc('cliques_whatsapp');
+      try {
+        const doc = await cliqueRef.get();
+        if (doc.exists) {
+          await cliqueRef.update({
+            total: (doc.data().total || 0) + 1,
+            ultimoClique: firebase.firestore.FieldValue.serverTimestamp(),
+            ultimoCliente: 'site_vendas'
+          });
+        } else {
+          await cliqueRef.set({
+            total: 1,
+            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao registrar clique:', error);
+      }
+    }
+
+    // ==================== PRODUTOS ====================
+    const PRODUCTS = [
+      {
+        id: 'barbearia-basic',
+        name: 'Barbearia Basic',
+        type: 'Sistema para Barbearia',
+        icon: 'fa-solid fa-scissors',
+        badge: 'MAIS VENDIDO',
+        featured: true,
+        installPrice: 197,
+        monthlyPrice: 49.90,
+        features: ['Agendamento online 24h', '1 barbeiro', 'Painel admin completo', 'Controle de horários', 'Login de clientes', 'Design responsivo', 'Firebase integrado'],
+        whatsappMessage: 'Olá! Tenho interesse no *Barbearia Basic* (R$197 + R$49,90/mês).'
+      },
+      {
+        id: 'barbearia-premium',
+        name: 'Barbearia Premium',
+        type: 'Sistema para Barbearia',
+        icon: 'fa-solid fa-crown',
+        badge: 'PREMIUM',
+        featured: true,
+        installPrice: 227,
+        monthlyPrice: 59.90,
+        features: ['Tudo do Basic', 'Múltiplos barbeiros', 'Notificações em tempo real', 'Som personalizado', 'Relatórios', 'Personalização de cores', 'Logo e identidade'],
+        whatsappMessage: 'Olá! Quero o *Barbearia Premium* (R$227 + R$59,90/mês).'
+      },
+      {
+        id: 'salao-basic',
+        name: 'Salão Basic',
+        type: 'Sistema para Salão',
+        icon: 'fa-solid fa-spa',
+        badge: 'BELEZA',
+        featured: false,
+        installPrice: 197,
+        monthlyPrice: 49.90,
+        features: ['Agendamento para salão', '1 profissional', 'Painel admin', 'Controle de agenda', 'Cadastro de clientes', 'Interface elegante', 'Hospedagem gratuita'],
+        whatsappMessage: 'Olá! Gostaria do *Salão Basic* (R$197 + R$49,90/mês).'
+      },
+      {
+        id: 'salao-premium',
+        name: 'Salão Premium',
+        type: 'Sistema para Salão',
+        icon: 'fa-solid fa-gem',
+        badge: 'TOP',
+        featured: true,
+        installPrice: 227,
+        monthlyPrice: 59.90,
+        features: ['Múltiplos profissionais', 'Notificações inteligentes', 'Alertas sonoros', 'Relatórios detalhados', 'Cores personalizadas', 'Logo do salão', 'Suporte prioritário'],
+        whatsappMessage: 'Olá! Quero o *Salão Premium* (R$227 + R$59,90/mês).'
+      }
+    ];
+
+    const phoneNumber = "5511919698999";
+
+    function formatCurrency(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function buildProductHTML(product) {
+      const featuresHTML = product.features.map(f => `<li><i class="fa-solid fa-circle-check"></i> ${f}</li>`).join('');
+      const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(product.whatsappMessage)}`;
+      const featuredClass = product.featured ? 'featured' : '';
+      return `
+        <div class="product-card ${featuredClass}">
+          ${product.badge ? `<span class="badge">${product.badge}</span>` : ''}
+          <i class="${product.icon} product-icon"></i>
+          <h3 class="product-name">${product.name}</h3>
+          <p class="product-type">${product.type}</p>
+          <div class="price-block">
+            <div class="installment"><span>💰 Instalação</span><span>${formatCurrency(product.installPrice)}</span></div>
+            <div class="monthly"><span>📅 Mensalidade</span><span>${formatCurrency(product.monthlyPrice)}/mês</span></div>
+          </div>
+          <ul class="features-list">${featuresHTML}</ul>
+          <a href="${whatsappLink}" target="_blank" class="buy-button product-buy-btn" data-product="${product.name}"><i class="fab fa-whatsapp"></i> Comprar agora</a>
+        </div>
+      `;
+    }
+
+    function renderProducts() {
+      const container = document.getElementById('productsContainer');
+      if (container) container.innerHTML = PRODUCTS.map(buildProductHTML).join('');
+      
+      // Adicionar eventos para registrar cliques nos botões de compra
+      document.querySelectorAll('.product-buy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          registrarCliqueWhatsApp();
+        });
+      });
+    }
+
+    // ==================== EVENTO DO BOTÃO PRINCIPAL ====================
+    document.getElementById('whatsappButton')?.addEventListener('click', () => {
+      registrarCliqueWhatsApp();
+    });
+
+    // ==================== INICIALIZAR ====================
+    renderProducts();
+    registrarVisita();
+
+    console.log('💎 AgendaFull Store • Contagem invisível ativa!');
+  </script>
+</body>
+</html>
